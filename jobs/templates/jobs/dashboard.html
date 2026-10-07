@@ -1,0 +1,82 @@
+{% extends 'jobs/base.html' %}
+
+{% block title %}Личный кабинет{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">Моя статистика откликов</h2>
+
+<!-- Карточки со статистикой -->
+<div class="row mb-5">
+    <div class="col-md-3">
+        <div class="card text-white bg-primary shadow">
+            <div class="card-body text-center">
+                <h5 class="card-title">Сегодня</h5>
+                <h2 class="display-4">{{ stats.today }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-success shadow">
+            <div class="card-body text-center">
+                <h5 class="card-title">За неделю</h5>
+                <h2 class="display-4">{{ stats.this_week }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-dark bg-warning shadow">
+            <div class="card-body text-center">
+                <h5 class="card-title">За месяц</h5>
+                <h2 class="display-4">{{ stats.this_month }}</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card text-white bg-dark shadow">
+            <div class="card-body text-center">
+                <h5 class="card-title">Всего</h5>
+                <h2 class="display-4">{{ stats.total }}</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Таблица последних откликов -->
+<h4 class="mb-3">Последние отклики (Топ-10)</h4>
+<div class="card shadow-sm">
+    <div class="card-body p-0">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Дата</th>
+                    <th>Должность</th>
+                    <th>Компания</th>
+                    <th>Формат</th>
+                    <th>Ссылка</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for app in recent_applications %}
+                <tr>
+                    <td>{{ app.applied_at|date:"d.m.Y H:i" }}</td>
+                    <td class="fw-bold">{{ app.vacancy.title }}</td>
+                    <td>{{ app.vacancy.company }}</td>
+                    <td>{{ app.vacancy.get_work_format_display }}</td>
+                    <td>
+                        <a href="{{ vacancy.external_url }}" target="_blank" rel="noreferrer noopener" class="text-decoration-none">
+                            Перейти ↗
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center py-4 text-muted">
+                        Вы пока не откликнулись ни на одну вакансию. Самое время начать!
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,91 @@
+{% extends 'jobs/base.html' %}
+
+{% block title %}Поиск вакансий{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Боковая панель с фильтрами -->
+    <div class="col-md-3">
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <h5 class="card-title mb-3">Фильтры</h5>
+                <form method="get" action="">
+                    <div class="mb-3">
+                        <label class="form-label">Поиск по названию</label>
+                        <input type="text" name="q" class="form-control" placeholder="Python, Django..." value="{{ request.GET.q }}">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Сфера деятельности</label>
+                        <input type="text" name="sphere" class="form-control" placeholder="IT, Маркетинг..." value="{{ request.GET.sphere }}">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Формат работы</label>
+                        <select name="format" class="form-select">
+                            <option value="">Все форматы</option>
+                            <option value="remote" {% if request.GET.format == 'remote' %}selected{% endif %}>Удаленно</option>
+                            <option value="office" {% if request.GET.format == 'office' %}selected{% endif %}>В офисе</option>
+                            <option value="hybrid" {% if request.GET.format == 'hybrid' %}selected{% endif %}>Гибрид</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Найти</button>
+                    <a href="/" class="btn btn-outline-secondary w-100 mt-2">Сбросить</a>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Список вакансий -->
+    <div class="col-md-9">
+        <h2 class="mb-4">Найдено вакансий: {{ vacancies.count }}</h2>
+        
+        {% for vacancy in vacancies %}
+            <div class="card shadow-sm mb-3">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h4 class="card-title text-primary">{{ vacancy.title }}</h4>
+                            <h6 class="card-subtitle mb-2 text-muted">{{ vacancy.company }}</h6>
+                        </div>
+                        <span class="badge bg-secondary">{{ vacancy.get_work_format_display }}</span>
+                    </div>
+                    
+                    <p class="mt-2 text-success fw-bold">
+                        {% if vacancy.salary_from and vacancy.salary_to %}
+                            От {{ vacancy.salary_from }} до {{ vacancy.salary_to }} руб.
+                        {% elif vacancy.salary_from %}
+                            От {{ vacancy.salary_from }} руб.
+                        {% elif vacancy.salary_to %}
+                            До {{ vacancy.salary_to }} руб.
+                        {% else %}
+                            Зарплата не указана
+                        {% endif %}
+                    </p>
+
+                    <p class="card-text">{{ vacancy.description|truncatechars:200 }}</p>
+                    
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <small class="text-muted">Источник: {{ vacancy.source }} | Дата: {{ vacancy.published_at|date:"d M Y" }}</small>
+                        
+                        <div class="btn-group">
+                            <a href="{{ vacancy.external_url }}" target="_blank" rel="noreferrer noopener" class="btn btn-outline-info btn-sm">Смотреть оригинал</a>
+                            
+                            {% if user.is_authenticated %}
+                                <form method="post" action="/apply/{{ vacancy.id }}/" class="d-inline ms-2">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-success btn-sm">Откликнуться</button>
+                                </form>
+                            {% else %}
+                                <button class="btn btn-success btn-sm ms-2 disabled" title="Войдите, чтобы откликнуться">Откликнуться</button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="alert alert-info">
+                По вашему запросу ничего не найдено. Попробуйте изменить фильтры.
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
