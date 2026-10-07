@@ -11,6 +11,8 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'your-secret-key')
 DEBUG = os.getenv('DEBUG', 'True') == 'True'
 ALLOWED_HOSTS = ['*'] # Позже заменить на свой домен
 
+SUPERJOB_API_KEY = os.getenv('SUPERJOB_API_KEY', '')
+
 DEBUG = True
 
 ALLOWED_HOSTS = []

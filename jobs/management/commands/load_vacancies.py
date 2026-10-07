@@ -1,24 +1,19 @@
 from django.core.management.base import BaseCommand
 from jobs.services.hh_parser import fetch_hh_vacancies
-from jobs.models import Vacancy
+from jobs.services.superjob_parser import fetch_superjob_vacancies
 
 
 class Command(BaseCommand):
-    help = 'Загружает свежие вакансии с HH.ru в базу данных'
+    help = 'Загружает свежие вакансии со всех источников'
 
     def add_arguments(self, parser):
         parser.add_argument('--query', type=str, default='python backend')
 
     def handle(self, *args, **options):
         query = options['query']
+        self.stdout.write(self.style.NOTICE(f'Сбор по запросу: "{query}"...'))
 
-        # ОЧИЩАЕМ БАЗУ ОТ СТАРЫХ ВАКАНСИЙ ПЕРЕД ГЕНЕРАЦИЕЙ
-        deleted_count, _ = Vacancy.objects.all().delete()
-        self.stdout.write(self.style.WARNING(f'Удалено старых вакансий: {deleted_count}'))
+        fetch_hh_vacancies(text_query=query)
+        fetch_superjob_vacancies(keyword=query)
 
-        self.stdout.write(self.style.NOTICE(f'Начинаем сбор вакансий по запросу: "{query}"...'))
-        try:
-            fetch_hh_vacancies(text_query=query)
-            self.stdout.write(self.style.SUCCESS('Команда успешно завершена!'))
-        except Exception as e:
-            self.stdout.write(self.style.ERROR(f'Ошибка: {e}'))
+        self.stdout.write(self.style.SUCCESS('Сбор успешно завершен!'))
