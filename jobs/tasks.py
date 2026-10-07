@@ -1,6 +1,6 @@
 from celery import shared_task
 from .services.hh_parser import fetch_hh_vacancies
-from .services.superjob_parser import fetch_superjob_vacancies
+from .services.habr_parser import fetch_habr_vacancies
 
 
 @shared_task
@@ -16,9 +16,23 @@ def update_vacancies_task():
     except Exception as e:
         print(f"Ошибка сбора с HH: {e}")
 
-    # 2. SuperJob
+    # 2. Habr карьера
+    try:
+        fetch_habr_vacancies("python")
+        fetch_habr_vacancies("Backend-developer")
+        fetch_habr_vacancies("Backend-разработчик")
+        fetch_habr_vacancies("Backend разработчик")
+        fetch_habr_vacancies("Python-разработчик")
+    except Exception as e:
+        print(f"Ошибка сбора с Habr: {e}")
+
+    # 3. SuperJob
     try:
         fetch_superjob_vacancies("Python")
+        fetch_superjob_vacancies("Backend-developer")
+        fetch_superjob_vacancies("Backend-разработчик")
+        fetch_superjob_vacancies("Backend разработчик")
+        fetch_superjob_vacancies("Python-разработчик")
     except Exception as e:
         print(f"Ошибка сбора с SuperJob: {e}")
 

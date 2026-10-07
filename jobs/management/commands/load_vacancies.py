@@ -1,6 +1,7 @@
 from django.core.management.base import BaseCommand
 from jobs.services.hh_parser import fetch_hh_vacancies
 from jobs.services.superjob_parser import fetch_superjob_vacancies
+from jobs.services.habr_parser import fetch_habr_vacancies
 
 
 class Command(BaseCommand):
@@ -15,5 +16,6 @@ class Command(BaseCommand):
 
         fetch_hh_vacancies(text_query=query)
         fetch_superjob_vacancies(keyword=query)
+        fetch_habr_vacancies(query="python")
 
         self.stdout.write(self.style.SUCCESS('Сбор успешно завершен!'))

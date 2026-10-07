@@ -1,5 +1,5 @@
 import requests
-from datetime import datetime
+from datetime import datetime, timezone
 from django.conf import settings
 from jobs.models import Vacancy
 
@@ -44,8 +44,15 @@ def fetch_superjob_vacancies(keyword="Python"):
             if payment_to == 0:
                 payment_to = None
 
-            # 3. Дата публикации (Unix timestamp)
-            date_published = datetime.fromtimestamp(item.get('date_published'))
+            # Получаем timestamp публикации
+            ts = item.get('date_published')
+
+            if ts:
+                # Преобразуем timestamp с явным указанием UTC
+                date_published = datetime.fromtimestamp(ts, tz=timezone.utc)
+            else:
+                # Если дата не пришла, ставим текущее время
+                date_published = datetime.now(tz=timezone.utc)
 
             # 4. Описание
             description = item.get('candidat') or "Описание доступно по ссылке."
